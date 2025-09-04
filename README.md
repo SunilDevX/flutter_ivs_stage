@@ -42,23 +42,7 @@ dependencies:
 
 ### iOS Setup
 
-1. Add the Amazon IVS SDK to your iOS project by updating `ios/Podfile`:
-
-```ruby
-platform :ios, '12.0'
-
-target 'Runner' do
-  use_frameworks!
-  use_modular_headers!
-
-  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-  
-  # Add Amazon IVS Broadcast SDK
-  pod 'AmazonIVSBroadcast', '~> 1.15.0'
-end
-```
-
-2. Add required permissions to `ios/Runner/Info.plist`:
+1. Add required permissions to `ios/Runner/Info.plist`:
 
 ```xml
 <key>NSCameraUsageDescription</key>
@@ -71,7 +55,7 @@ end
 </array>
 ```
 
-3. Run `cd ios && pod install`
+2. Run `cd ios && pod install`
 
 ## Usage Options
 
