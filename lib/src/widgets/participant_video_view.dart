@@ -8,12 +8,14 @@ class ParticipantVideoView extends StatelessWidget {
   final StageParticipant participant;
   final bool showControls;
   final bool isCompact;
+  final bool showVideoPreview;
 
   const ParticipantVideoView({
     super.key,
     required this.participant,
     this.showControls = true,
     this.isCompact = false,
+    this.showVideoPreview = true,
   });
 
   @override
@@ -53,7 +55,8 @@ class ParticipantVideoView extends StatelessWidget {
     final videoStream = participant.videoStream;
     final isVideoMuted = videoStream?.isMuted ?? true;
 
-    if (isVideoMuted || participant.isAudioOnly) {
+    // If video preview is disabled, always show placeholder
+    if (!showVideoPreview || isVideoMuted || participant.isAudioOnly) {
       // Show avatar placeholder
       return Container(
         width: double.infinity,
@@ -77,7 +80,11 @@ class ParticipantVideoView extends StatelessWidget {
             if (!isCompact) ...[
               const SizedBox(height: 8),
               Text(
-                isVideoMuted ? 'Camera Off' : 'Audio Only',
+                !showVideoPreview
+                    ? participant.participantId ?? 'User'
+                    : isVideoMuted
+                    ? 'Camera Off'
+                    : 'Audio Only',
                 style: TextStyle(color: Colors.grey[400], fontSize: 12),
               ),
             ],
@@ -86,7 +93,7 @@ class ParticipantVideoView extends StatelessWidget {
       );
     }
 
-    // Show actual video stream using platform view
+    // Show actual video stream using platform view (only when showVideoPreview is true)
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: UiKitView(

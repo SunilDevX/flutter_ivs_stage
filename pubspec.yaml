@@ -1,7 +1,9 @@
 name: flutter_ivs_stage
 description: "A new Flutter project."
 version: 0.0.1
-homepage:
+homepage: https://sunilflutter.in
+repository: https://github.com/SunilDevX/flutter_ivs_stage
+issue_tracker: https://github.com/SunilDevX/flutter_ivs_stage/issues
 
 environment:
   sdk: ^3.9.0

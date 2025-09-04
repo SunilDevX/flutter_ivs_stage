@@ -34,6 +34,8 @@ class _StageViewState extends State<StageView> {
   bool _isLocalAudioMuted = false;
   bool _isLocalVideoMuted = false;
   bool _isBroadcasting = false;
+  bool _mirrorLocalVideo = false;
+  bool _mirrorRemoteVideo = false;
 
   @override
   void initState() {
@@ -42,26 +44,23 @@ class _StageViewState extends State<StageView> {
     _checkPermissions();
   }
 
+  /// Safely update participant selection, preserving current selection when possible
+  void _updateParticipantSelection(List<StageParticipant> newParticipants) {
+    // Only clear selection if the selected participant actually left
+    if (_selectedParticipantId != null &&
+        !newParticipants.any(
+          (p) => p.participantId == _selectedParticipantId,
+        )) {
+      _selectedParticipantId = null;
+    }
+  }
+
   void _setupStreams() {
     // Listen to participants stream
     FlutterIvsStage.participantsStream.listen((participants) {
       setState(() {
         _participants = participants;
-        // Auto-select the first remote participant if no one is selected
-        if (_selectedParticipantId == null && participants.length > 1) {
-          final remoteParticipant = participants.firstWhere(
-            (p) => p.isLocal == false,
-            orElse: () => participants.first,
-          );
-          _selectedParticipantId = remoteParticipant.participantId;
-        }
-        // Clear selection if participant left
-        if (_selectedParticipantId != null &&
-            !participants.any(
-              (p) => p.participantId == _selectedParticipantId,
-            )) {
-          _selectedParticipantId = null;
-        }
+        _updateParticipantSelection(participants);
       });
     });
 
@@ -70,6 +69,11 @@ class _StageViewState extends State<StageView> {
       setState(() {
         _connectionState = state;
       });
+
+      // Apply default mirroring when connected
+      if (state == StageConnectionState.connected) {
+        _updateMirroring();
+      }
     });
 
     // Listen to audio mute state
@@ -169,32 +173,38 @@ class _StageViewState extends State<StageView> {
                   borderRadius: BorderRadius.circular(12),
                   color: Colors.black,
                 ),
-                child: selectedParticipant.participantId != null
-                    ? ParticipantVideoView(
-                        participant: selectedParticipant,
-                        showControls: false,
-                      )
-                    : const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.video_call_outlined,
-                              size: 64,
-                              color: Colors.grey,
-                            ),
-                            SizedBox(height: 16),
-                            Text(
-                              'Currently Viewing',
-                              style: TextStyle(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: selectedParticipant.participantId != null
+                      ? ParticipantVideoView(
+                          key: ValueKey(selectedParticipant.participantId),
+                          participant: selectedParticipant,
+                          showControls: false,
+                          showVideoPreview: true,
+                        )
+                      : const Center(
+                          key: ValueKey('empty_state'),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.video_call_outlined,
+                                size: 64,
                                 color: Colors.grey,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
                               ),
-                            ),
-                          ],
+                              SizedBox(height: 16),
+                              Text(
+                                'Currently Viewing',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
+                ),
               ),
             ),
           ),
@@ -230,9 +240,12 @@ class _StageViewState extends State<StageView> {
   }
 
   Widget _buildParticipantList() {
-    final otherParticipants = _participants
-        .where((p) => p.participantId != _selectedParticipantId)
-        .toList();
+    final otherParticipants = _participants.where((p) {
+      if (_selectedParticipantId == null) {
+        return !p.isLocal;
+      }
+      return p.participantId != _selectedParticipantId;
+    }).toList();
 
     if (otherParticipants.isEmpty) {
       return Container();
@@ -251,6 +264,10 @@ class _StageViewState extends State<StageView> {
               setState(() {
                 _selectedParticipantId = participant.participantId;
               });
+              // Small delay to let the UI update, then refresh the main view
+              Future.delayed(const Duration(milliseconds: 100), () {
+                FlutterIvsStage.refreshVideoPreviews();
+              });
             },
             child: Container(
               width: 100,
@@ -262,6 +279,8 @@ class _StageViewState extends State<StageView> {
                 participant: participant,
                 showControls: true,
                 isCompact: true,
+                showVideoPreview:
+                    false, // Participant boxes don't show video preview
               ),
             ),
           ),
@@ -284,6 +303,10 @@ class _StageViewState extends State<StageView> {
             _buildJoinControls()
           else
             _buildStageControls(),
+          const SizedBox(height: 16),
+          // Video mirroring controls
+          if (_connectionState == StageConnectionState.connected)
+            _buildMirroringControls(),
           const SizedBox(height: 16),
           // Broadcasting controls
           _buildBroadcastControls(),
@@ -319,6 +342,72 @@ class _StageViewState extends State<StageView> {
           backgroundColor: Colors.red,
         ),
       ],
+    );
+  }
+
+  Widget _buildMirroringControls() {
+    return Column(
+      children: [
+        Text(
+          'Video Mirroring',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildMirrorToggle(
+              label: 'Local Video',
+              value: _mirrorLocalVideo,
+              onChanged: (value) {
+                setState(() {
+                  _mirrorLocalVideo = value;
+                });
+                _updateMirroring();
+              },
+            ),
+            _buildMirrorToggle(
+              label: 'Remote Video',
+              value: _mirrorRemoteVideo,
+              onChanged: (value) {
+                setState(() {
+                  _mirrorRemoteVideo = value;
+                });
+                _updateMirroring();
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMirrorToggle({
+    required String label,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(label, style: TextStyle(color: Colors.white70, fontSize: 12)),
+        Switch(
+          value: value,
+          onChanged: onChanged,
+          activeThumbColor: Colors.blue,
+        ),
+      ],
+    );
+  }
+
+  void _updateMirroring() {
+    FlutterIvsStage.setVideoMirroring(
+      localVideo: _mirrorLocalVideo,
+      remoteVideo: _mirrorRemoteVideo,
     );
   }
 

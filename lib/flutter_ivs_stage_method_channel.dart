@@ -13,11 +13,21 @@ class MethodChannelFlutterIvsStage extends FlutterIvsStagePlatform {
   final methodChannel = const MethodChannel('flutter_ivs_stage');
 
   /// Event channels for streaming data
-  final _participantsEventChannel = const EventChannel('flutter_ivs_stage/participants');
-  final _connectionStateEventChannel = const EventChannel('flutter_ivs_stage/connection_state');
-  final _localAudioMutedEventChannel = const EventChannel('flutter_ivs_stage/local_audio_muted');
-  final _localVideoMutedEventChannel = const EventChannel('flutter_ivs_stage/local_video_muted');
-  final _broadcastingEventChannel = const EventChannel('flutter_ivs_stage/broadcasting');
+  final _participantsEventChannel = const EventChannel(
+    'flutter_ivs_stage/participants',
+  );
+  final _connectionStateEventChannel = const EventChannel(
+    'flutter_ivs_stage/connection_state',
+  );
+  final _localAudioMutedEventChannel = const EventChannel(
+    'flutter_ivs_stage/local_audio_muted',
+  );
+  final _localVideoMutedEventChannel = const EventChannel(
+    'flutter_ivs_stage/local_video_muted',
+  );
+  final _broadcastingEventChannel = const EventChannel(
+    'flutter_ivs_stage/broadcasting',
+  );
   final _errorEventChannel = const EventChannel('flutter_ivs_stage/error');
 
   Stream<List<StageParticipant>>? _participantsStream;
@@ -29,7 +39,9 @@ class MethodChannelFlutterIvsStage extends FlutterIvsStagePlatform {
 
   @override
   Future<String?> getPlatformVersion() async {
-    final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
+    final version = await methodChannel.invokeMethod<String>(
+      'getPlatformVersion',
+    );
     return version;
   }
 
@@ -55,7 +67,9 @@ class MethodChannelFlutterIvsStage extends FlutterIvsStagePlatform {
 
   @override
   Future<void> toggleAudioOnlySubscribe(String participantId) async {
-    await methodChannel.invokeMethod('toggleAudioOnlySubscribe', {'participantId': participantId});
+    await methodChannel.invokeMethod('toggleAudioOnlySubscribe', {
+      'participantId': participantId,
+    });
   }
 
   @override
@@ -89,13 +103,16 @@ class MethodChannelFlutterIvsStage extends FlutterIvsStagePlatform {
     _participantsStream ??= _participantsEventChannel
         .receiveBroadcastStream()
         .map<List<StageParticipant>>((data) {
-      if (data is List) {
-        return data
-            .map<StageParticipant>((item) => StageParticipant.fromMap(Map<String, dynamic>.from(item)))
-            .toList();
-      }
-      return <StageParticipant>[];
-    });
+          if (data is List) {
+            return data
+                .map<StageParticipant>(
+                  (item) =>
+                      StageParticipant.fromMap(Map<String, dynamic>.from(item)),
+                )
+                .toList();
+          }
+          return <StageParticipant>[];
+        });
     return _participantsStream!;
   }
 
@@ -103,7 +120,9 @@ class MethodChannelFlutterIvsStage extends FlutterIvsStagePlatform {
   Stream<StageConnectionState> get connectionStateStream {
     _connectionStateStream ??= _connectionStateEventChannel
         .receiveBroadcastStream()
-        .map<StageConnectionState>((data) => StageConnectionState.fromString(data.toString()));
+        .map<StageConnectionState>(
+          (data) => StageConnectionState.fromString(data.toString()),
+        );
     return _connectionStateStream!;
   }
 
@@ -135,7 +154,9 @@ class MethodChannelFlutterIvsStage extends FlutterIvsStagePlatform {
   Stream<StageError> get errorStream {
     _errorStream ??= _errorEventChannel
         .receiveBroadcastStream()
-        .map<StageError>((data) => StageError.fromMap(Map<String, dynamic>.from(data)));
+        .map<StageError>(
+          (data) => StageError.fromMap(Map<String, dynamic>.from(data)),
+        );
     return _errorStream!;
   }
 
@@ -148,5 +169,21 @@ class MethodChannelFlutterIvsStage extends FlutterIvsStagePlatform {
     _localVideoMutedStream = null;
     _broadcastingStream = null;
     _errorStream = null;
+  }
+
+  @override
+  Future<void> refreshVideoPreviews() async {
+    await methodChannel.invokeMethod('refreshVideoPreviews');
+  }
+
+  @override
+  Future<void> setVideoMirroring({
+    required bool localVideo,
+    required bool remoteVideo,
+  }) async {
+    await methodChannel.invokeMethod('setVideoMirroring', {
+      'localVideo': localVideo,
+      'remoteVideo': remoteVideo,
+    });
   }
 }

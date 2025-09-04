@@ -138,6 +138,20 @@ public class FlutterIvsStagePlugin: NSObject, FlutterPlugin {
             stageManager.dispose()
             result(nil)
             
+        case "refreshVideoPreviews":
+            stageManager.refreshAllVideoPreviews()
+            result(nil)
+            
+        case "setVideoMirroring":
+            if let args = call.arguments as? [String: Any],
+               let localVideo = args["localVideo"] as? Bool,
+               let remoteVideo = args["remoteVideo"] as? Bool {
+                stageManager.setVideoMirroring(localVideo: localVideo, remoteVideo: remoteVideo)
+                result(nil)
+            } else {
+                result(FlutterError(code: "INVALID_ARGUMENTS", message: "localVideo and remoteVideo flags are required", details: nil))
+            }
+            
         default:
             result(FlutterMethodNotImplemented)
         }

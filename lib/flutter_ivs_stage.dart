@@ -94,4 +94,23 @@ class FlutterIvsStage {
   static Future<void> dispose() {
     return _platform.dispose();
   }
+
+  /// Refresh all video previews (useful when switching views)
+  static Future<void> refreshVideoPreviews() {
+    return _platform.refreshVideoPreviews();
+  }
+
+  /// Set video mirroring for local and/or remote video streams
+  ///
+  /// [localVideo] - Mirror the local camera preview (useful for front camera)
+  /// [remoteVideo] - Mirror remote participants' video streams
+  static Future<void> setVideoMirroring({
+    required bool localVideo,
+    required bool remoteVideo,
+  }) {
+    return _platform.setVideoMirroring(
+      localVideo: localVideo,
+      remoteVideo: remoteVideo,
+    );
+  }
 }

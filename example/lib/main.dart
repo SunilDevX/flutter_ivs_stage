@@ -16,130 +16,113 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const TokenSelectionPage(),
+      home: const DemoSelectionPage(),
     );
   }
 }
 
-class TokenConfig {
-  final String key;
-  final String url;
-  final String token;
-  final String displayName;
-
-  const TokenConfig({
-    required this.key,
-    required this.url,
-    required this.token,
-    required this.displayName,
-  });
-}
-
-class TokenSelectionPage extends StatelessWidget {
-  const TokenSelectionPage({super.key});
-
-  static const List<TokenConfig> _tokenConfigs = [
-    TokenConfig(
-      key: "sk_us-east-1_u0AwAFbvFgns_RB85KQEnyoHTKc2Bc2eHIRQZYBMyes",
-      url: "rtmps://7453a0e95db4.global-contribute.live-video.net:443/app/",
-      token:
-          "eyJhbGciOiJLTVMiLCJ0eXAiOiJKV1QifQ.eyJleHAiOjE3NTY5MjMxMTgsImlhdCI6MTc1NjcwNzExOCwianRpIjoiYTVYUzdzODNIaWdpIiwicmVzb3VyY2UiOiJhcm46YXdzOml2czp1cy1lYXN0LTE6NjU1NzU4MjM3OTc0OnN0YWdlL3VBVkRGZFNUeXRIRSIsInRvcGljIjoidUFWREZkU1R5dEhFIiwiZXZlbnRzX3VybCI6IndzczovL2dsb2JhbC5ldmVudHMubGl2ZS12aWRlby5uZXQiLCJ3aGlwX3VybCI6Imh0dHBzOi8vNzQ1M2EwZTk1ZGI0Lmdsb2JhbC1ibS53aGlwLmxpdmUtdmlkZW8ubmV0IiwidXNlcl9pZCI6Imd1ZXN0LTE3NTY3MDcxMTciLCJjYXBhYmlsaXRpZXMiOnsiYWxsb3dfcHVibGlzaCI6dHJ1ZSwiYWxsb3dfc3Vic2NyaWJlIjp0cnVlfSwidmVyc2lvbiI6IjAuMCJ9.MGYCMQCZxkZ53StQOz4StAA-gAu2NE8iYFuhOrFaAqIUXW8lMewqEBPI9mZwYxWgNJy7DAsCMQC8VlQUDiCNQHY1SGCuP321vlr2JxcIcY2mded-nugzdbfQ8CROoOzCOnX3-Juk7Fo",
-      displayName: "Room 1",
-    ),
-    TokenConfig(
-      key: "sk_us-east-1_RSL7QAIDuoWE_79iUJnsoDPLWBtg3n3FBDEfe4W1sAH",
-      url: "rtmps://7453a0e95db4.global-contribute.live-video.net:443/app/",
-      token:
-          "eyJhbGciOiJLTVMiLCJ0eXAiOiJKV1QifQ.eyJleHAiOjE3NTY5MjMxNDEsImlhdCI6MTc1NjcwNzE0MSwianRpIjoiUGpKclZVNEVrcVRuIiwicmVzb3VyY2UiOiJhcm46YXdzOml2czp1cy1lYXN0LTE6NjU1NzU4MjM3OTc0OnN0YWdlL3VBVkRGZFNUeXRIRSIsInRvcGljIjoidUFWREZkU1R5dEhFIiwiZXZlbnRzX3VybCI6IndzczovL2dsb2JhbC5ldmVudHMubGl2ZS12aWRlby5uZXQiLCJ3aGlwX3VybCI6Imh0dHBzOi8vNzQ1M2EwZTk1ZGI0Lmdsb2JhbC1ibS53aGlwLmxpdmUtdmlkZW8ubmV0IiwidXNlcl9pZCI6Imd1ZXN0LTE3NTY3MDcxNDAiLCJjYXBhYmlsaXRpZXMiOnsiYWxsb3dfcHVibGlzaCI6dHJ1ZSwiYWxsb3dfc3Vic2NyaWJlIjp0cnVlfSwidmVyc2lvbiI6IjAuMCJ9.MGQCMDXgvX6LtdZY5Zqkt7QH9DMU65fTW8eWMS251dzy6AN9Pig26-xOBHOCCubPRKnO7AIwMFczEn8Eg91P9XlLTDbJdAW1tjllrIWS7YGZubt3DBI5M4Jx-m49GVej1OdYzCiL",
-      displayName: "Room 2",
-    ),
-    TokenConfig(
-      key: "sk_us-east-1_vLeJoSeVSWSK_Rp8caMzIUmB6j4Oa0Dd0Ldzde8otVi",
-      url: "rtmps://7453a0e95db4.global-contribute.live-video.net:443/app/",
-      token:
-          "eyJhbGciOiJLTVMiLCJ0eXAiOiJKV1QifQ.eyJleHAiOjE3NTY5MjMxODIsImlhdCI6MTc1NjcwNzE4MiwianRpIjoibU1FNFI2M1lxU25iIiwicmVzb3VyY2UiOiJhcm46YXdzOml2czp1cy1lYXN0LTE6NjU1NzU4MjM3OTc0OnN0YWdlL3VBVkRGZFNUeXRIRSIsInRvcGljIjoidUFWREZkU1R5dEhFIiwiZXZlbnRzX3VybCI6IndzczovL2dsb2JhbC5ldmVudHMubGl2ZS12aWRlby5uZXQiLCJ3aGlwX3VybCI6Imh0dHBzOi8vNzQ1M2EwZTk1ZGI0Lmdsb2JhbC1ibS53aGlwLmxpdmUtdmlkZW8ubmV0IiwidXNlcl9pZCI6Imd1ZXN0LTE3NTY3MDcxODEiLCJjYXBhYmlsaXRpZXMiOnsiYWxsb3dfcHVibGlzaCI6dHJ1ZSwiYWxsb3dfc3Vic2NyaWJlIjp0cnVlfSwidmVyc2lvbiI6IjAuMCJ9.MGQCMA8HAvLy-LSbRHg02iKlmqSa-g_c0qO6YcxWpHHCyNNHg8ANgzyrcYELWdbY_0_jsQIwRD_KbYqjkEXOD2Uj4U_K4qNbpF-jChqkUCC9DQ6O2tRv9od17D1IIrAv70GQuoF6",
-      displayName: "Room 3",
-    ),
-  ];
+class DemoSelectionPage extends StatelessWidget {
+  const DemoSelectionPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Select Room'),
-        backgroundColor: Colors.grey[900],
-        foregroundColor: Colors.white,
-        centerTitle: true,
+        title: const Text('Flutter IVS Stage Demo'),
+        backgroundColor: Colors.blue,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Icon(Icons.video_call, size: 80, color: Colors.blue),
-            const SizedBox(height: 20),
             const Text(
-              'Flutter IVS Stage Demo',
+              'Choose Implementation Approach:',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              'Choose a room to join:',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey, fontSize: 16),
             ),
             const SizedBox(height: 40),
-            ..._tokenConfigs.asMap().entries.map((entry) {
-              final config = entry.value;
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MyHomePage(tokenConfig: config),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 4,
+
+            // Built-in StageView Option
+            Card(
+              elevation: 4,
+              child: InkWell(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const BuiltInStageViewDemo(),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                ),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
                     children: [
-                      const Icon(Icons.meeting_room),
-                      const SizedBox(width: 12),
-                      Text(
-                        config.displayName,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+                      Icon(Icons.rocket_launch, size: 48, color: Colors.blue),
+                      const SizedBox(height: 12),
+                      const Text(
+                        '🚀 Built-in StageView',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Quick start with pre-built UI components.\nIncludes all controls and layouts.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey),
                       ),
                     ],
                   ),
                 ),
-              );
-            }),
-            const SizedBox(height: 40),
-            Text(
-              'Tap any room to join the stage',
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Custom UI Option
+            Card(
+              elevation: 4,
+              child: InkWell(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CustomUIDemo()),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Icon(Icons.palette, size: 48, color: Colors.purple),
+                      const SizedBox(height: 12),
+                      const Text(
+                        '🎨 Custom UI',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Build your own interface using core APIs.\nComplete control over design and behavior.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            const Spacer(),
+
+            const Text(
+              'Both approaches demonstrate:\n'
+              '• Multi-participant video calls\n'
+              '• Audio/video controls\n'
+              '• Broadcasting capabilities\n'
+              '• Real-time participant management',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey[400], fontSize: 14),
             ),
           ],
         ),
@@ -148,33 +131,401 @@ class TokenSelectionPage extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  final TokenConfig tokenConfig;
+// Built-in StageView Example
+class BuiltInStageViewDemo extends StatelessWidget {
+  const BuiltInStageViewDemo({super.key});
 
-  const MyHomePage({super.key, required this.tokenConfig});
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text('${widget.tokenConfig.displayName} - Flutter IVS Stage'),
-        backgroundColor: Colors.grey[900],
-        foregroundColor: Colors.white,
+        title: const Text('Built-in StageView Demo'),
+        backgroundColor: Colors.blue,
       ),
-      body: StageView(
-        initialToken: widget.tokenConfig.token,
-        streamKey: widget.tokenConfig.key,
-        streamUrl: widget.tokenConfig.url,
+      body: const StageView(
+        // You can provide initial token here or use the built-in join dialog
+        initialToken: null,
+        streamKey: 'your-stream-key',
+        streamUrl: 'your-rtmp-url',
         showControls: true,
         backgroundColor: Colors.black,
         aspectRatio: 16 / 9,
       ),
     );
+  }
+}
+
+// Custom UI Example
+class CustomUIDemo extends StatefulWidget {
+  const CustomUIDemo({super.key});
+
+  @override
+  State<CustomUIDemo> createState() => _CustomUIDemoState();
+}
+
+class _CustomUIDemoState extends State<CustomUIDemo> {
+  List<StageParticipant> _participants = [];
+  StageConnectionState _connectionState = StageConnectionState.disconnected;
+  bool _isLocalAudioMuted = false;
+  bool _isLocalVideoMuted = false;
+  bool _isBroadcasting = false;
+  String? _selectedParticipantId;
+
+  @override
+  void initState() {
+    super.initState();
+    _setupListeners();
+    _requestPermissions();
+  }
+
+  void _setupListeners() {
+    // Listen to real-time participant changes
+    FlutterIvsStage.participantsStream.listen((participants) {
+      setState(() {
+        _participants = participants;
+      });
+    });
+
+    // Listen to connection state changes
+    FlutterIvsStage.connectionStateStream.listen((state) {
+      setState(() {
+        _connectionState = state;
+      });
+    });
+
+    // Listen to mute state changes
+    FlutterIvsStage.localAudioMutedStream.listen((muted) {
+      setState(() {
+        _isLocalAudioMuted = muted;
+      });
+    });
+
+    FlutterIvsStage.localVideoMutedStream.listen((muted) {
+      setState(() {
+        _isLocalVideoMuted = muted;
+      });
+    });
+
+    // Listen to broadcasting state
+    FlutterIvsStage.broadcastingStream.listen((broadcasting) {
+      setState(() {
+        _isBroadcasting = broadcasting;
+      });
+    });
+
+    // Listen to errors
+    FlutterIvsStage.errorStream.listen((error) {
+      _showError(error);
+    });
+  }
+
+  Future<void> _requestPermissions() async {
+    await FlutterIvsStage.requestPermissions();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Custom UI Demo'),
+        backgroundColor: Colors.purple,
+        actions: [
+          // Connection status indicator
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            child: Chip(
+              label: Text(
+                _connectionState.toString().split('.').last.toUpperCase(),
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              backgroundColor: _getConnectionColor(),
+            ),
+          ),
+        ],
+      ),
+      backgroundColor: Colors.black,
+      body: Column(
+        children: [
+          // Main video area
+          Expanded(flex: 3, child: _buildMainVideoView()),
+
+          // Custom controls
+          _buildCustomControls(),
+
+          // Participant list
+          _buildParticipantList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMainVideoView() {
+    final selectedParticipant = _getSelectedParticipant();
+
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[900],
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.purple, width: 2),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: selectedParticipant != null
+            ? Stack(
+                children: [
+                  // Use the ParticipantVideoView widget
+                  ParticipantVideoView(
+                    participant: selectedParticipant,
+                    showControls: false,
+                    showVideoPreview: true,
+                  ),
+
+                  // Custom overlay with participant info
+                  Positioned(
+                    top: 16,
+                    left: 16,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        selectedParticipant.isLocal
+                            ? 'You'
+                            : 'Participant ${selectedParticipant.participantId}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.people, size: 64, color: Colors.grey),
+                    const SizedBox(height: 16),
+                    Text(
+                      _connectionState == StageConnectionState.connected
+                          ? 'No participants'
+                          : 'Not connected',
+                      style: const TextStyle(color: Colors.grey, fontSize: 18),
+                    ),
+                  ],
+                ),
+              ),
+      ),
+    );
+  }
+
+  Widget _buildCustomControls() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        alignment: WrapAlignment.center,
+        children: [
+          // Join/Leave button
+          _buildControlButton(
+            icon: _connectionState == StageConnectionState.connected
+                ? Icons.call_end
+                : Icons.call,
+            label: _connectionState == StageConnectionState.connected
+                ? 'Leave'
+                : 'Join',
+            onPressed: _connectionState == StageConnectionState.connected
+                ? FlutterIvsStage.leaveStage
+                : _showJoinDialog,
+            backgroundColor: _connectionState == StageConnectionState.connected
+                ? Colors.red
+                : Colors.green,
+          ),
+
+          // Audio control
+          _buildControlButton(
+            icon: _isLocalAudioMuted ? Icons.mic_off : Icons.mic,
+            label: _isLocalAudioMuted ? 'Unmute' : 'Mute',
+            onPressed: FlutterIvsStage.toggleLocalAudioMute,
+            backgroundColor: _isLocalAudioMuted ? Colors.red : Colors.green,
+            enabled: _connectionState == StageConnectionState.connected,
+          ),
+
+          // Video control
+          _buildControlButton(
+            icon: _isLocalVideoMuted ? Icons.videocam_off : Icons.videocam,
+            label: _isLocalVideoMuted ? 'Video On' : 'Video Off',
+            onPressed: FlutterIvsStage.toggleLocalVideoMute,
+            backgroundColor: _isLocalVideoMuted ? Colors.red : Colors.green,
+            enabled: _connectionState == StageConnectionState.connected,
+          ),
+
+          // Mirror control
+          _buildControlButton(
+            icon: Icons.flip_camera_ios,
+            label: 'Mirror',
+            onPressed: () => _toggleMirroring(),
+            backgroundColor: Colors.blue,
+            enabled: _connectionState == StageConnectionState.connected,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildParticipantList() {
+    if (_participants.length <= 1) return const SizedBox.shrink();
+
+    return SizedBox(
+      height: 120,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: _participants.length,
+        itemBuilder: (context, index) {
+          final participant = _participants[index];
+          final isSelected =
+              participant.participantId == _selectedParticipantId;
+
+          // Skip the currently selected participant in the list
+          if (isSelected) return const SizedBox.shrink();
+
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                _selectedParticipantId = participant.participantId;
+              });
+              // Refresh video views after switching
+              FlutterIvsStage.refreshVideoPreviews();
+            },
+            child: Container(
+              width: 90,
+              margin: const EdgeInsets.symmetric(horizontal: 6),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.purple.withOpacity(0.5),
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: ParticipantVideoView(
+                  participant: participant,
+                  showControls: false,
+                  isCompact: true,
+                  showVideoPreview: false, // Show placeholders in the list
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildControlButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+    Color? backgroundColor,
+    bool enabled = true,
+  }) {
+    return Opacity(
+      opacity: enabled ? 1.0 : 0.5,
+      child: ElevatedButton(
+        onPressed: enabled ? onPressed : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor ?? Colors.blue,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 20),
+            const SizedBox(height: 4),
+            Text(label, style: const TextStyle(fontSize: 10)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  StageParticipant? _getSelectedParticipant() {
+    if (_participants.isEmpty) return null;
+
+    return _participants.firstWhere(
+      (p) => p.participantId == _selectedParticipantId,
+      orElse: () => _participants.first,
+    );
+  }
+
+  Color _getConnectionColor() {
+    switch (_connectionState) {
+      case StageConnectionState.connected:
+        return Colors.green;
+      case StageConnectionState.connecting:
+        return Colors.orange;
+      case StageConnectionState.disconnected:
+        return Colors.red;
+    }
+  }
+
+  void _showJoinDialog() {
+    // Use the built-in JoinStageWidget
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Join Stage'),
+        content: const JoinStageWidget(),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _toggleMirroring() {
+    // Demo mirroring functionality
+    FlutterIvsStage.setVideoMirroring(localVideo: true, remoteVideo: false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Video mirroring enabled for local camera'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showError(StageError error) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Error: ${error.message}'),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    FlutterIvsStage.dispose();
+    super.dispose();
   }
 }

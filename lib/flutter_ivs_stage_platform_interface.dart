@@ -39,15 +39,21 @@ abstract class FlutterIvsStagePlatform extends PlatformInterface {
   }
 
   Future<void> toggleLocalAudioMute() {
-    throw UnimplementedError('toggleLocalAudioMute() has not been implemented.');
+    throw UnimplementedError(
+      'toggleLocalAudioMute() has not been implemented.',
+    );
   }
 
   Future<void> toggleLocalVideoMute() {
-    throw UnimplementedError('toggleLocalVideoMute() has not been implemented.');
+    throw UnimplementedError(
+      'toggleLocalVideoMute() has not been implemented.',
+    );
   }
 
   Future<void> toggleAudioOnlySubscribe(String participantId) {
-    throw UnimplementedError('toggleAudioOnlySubscribe() has not been implemented.');
+    throw UnimplementedError(
+      'toggleAudioOnlySubscribe() has not been implemented.',
+    );
   }
 
   Future<bool> setBroadcastAuth(String endpoint, String streamKey) {
@@ -92,5 +98,18 @@ abstract class FlutterIvsStagePlatform extends PlatformInterface {
 
   Future<void> dispose() {
     throw UnimplementedError('dispose() has not been implemented.');
+  }
+
+  Future<void> refreshVideoPreviews() {
+    throw UnimplementedError(
+      'refreshVideoPreviews() has not been implemented.',
+    );
+  }
+
+  Future<void> setVideoMirroring({
+    required bool localVideo,
+    required bool remoteVideo,
+  }) {
+    throw UnimplementedError('setVideoMirroring() has not been implemented.');
   }
 }
