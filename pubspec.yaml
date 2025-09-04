@@ -1,6 +1,6 @@
 name: flutter_ivs_stage
-description: "A new Flutter project."
-version: 0.0.1
+description: A comprehensive Flutter plugin for Amazon IVS (Interactive Video Service) real-time streaming with multi-participant video calls, broadcasting, and flexible UI components. Supports both built-in StageView widgets and custom UI development with core APIs.
+version: 1.0.0
 homepage: https://sunilflutter.in
 repository: https://github.com/SunilDevX/flutter_ivs_stage
 issue_tracker: https://github.com/SunilDevX/flutter_ivs_stage/issues
