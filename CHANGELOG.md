@@ -1,3 +1,8 @@
+## 1.0.1
+* Toggle Camera in stage
+* Fixed camera always open even after leave stage
+
+
 ## 1.0.0
 
 * **Initial Release** - Complete Flutter plugin for Amazon IVS real-time streaming
