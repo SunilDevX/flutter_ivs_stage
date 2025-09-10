@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 import '../../flutter_ivs_stage.dart';
@@ -61,9 +63,9 @@ class _StageViewState extends State<StageView> {
         setState(() {
           _isPreviewActive = true;
         });
-        print('Camera preview initialized successfully');
+        log('Camera preview initialized successfully');
       } catch (e) {
-        print('Failed to initialize camera preview: $e');
+        log('Failed to initialize camera preview: $e');
         setState(() {
           _isPreviewActive = false;
         });
@@ -79,9 +81,9 @@ class _StageViewState extends State<StageView> {
       setState(() {
         _currentCameraType = newCameraType;
       });
-      print('Camera toggled to: $newCameraType');
+      log('Camera toggled to: $newCameraType');
     } catch (e) {
-      print('Failed to toggle camera: $e');
+      log('Failed to toggle camera: $e');
     }
   }
 
@@ -93,9 +95,9 @@ class _StageViewState extends State<StageView> {
         setState(() {
           _isPreviewActive = false;
         });
-        print('Camera preview stopped');
+        log('Camera preview stopped');
       } catch (e) {
-        print('Failed to stop camera preview: $e');
+        log('Failed to stop camera preview: $e');
       }
     }
   }
@@ -288,7 +290,7 @@ class _StageViewState extends State<StageView> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.7),
+                  color: Colors.black.withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(

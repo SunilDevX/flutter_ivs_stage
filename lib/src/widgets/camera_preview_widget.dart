@@ -154,13 +154,13 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
             Icon(
               Icons.camera_alt,
               size: 64,
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
               'Camera preview not available',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 fontSize: 16,
               ),
             ),
@@ -173,11 +173,12 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
 
     // The actual camera preview will be rendered by the native platform view
     // This is handled automatically when initPreview is called
-    return Container(
-      child: Center(
-        child: Text(
-          'Camera Preview Active',
-          style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12),
+    return Center(
+      child: Text(
+        'Camera Preview Active',
+        style: TextStyle(
+          color: Colors.white.withValues(alpha: 0.8),
+          fontSize: 12,
         ),
       ),
     );
@@ -215,7 +216,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
+        color: Colors.black.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(8),
       ),
       child: InkWell(

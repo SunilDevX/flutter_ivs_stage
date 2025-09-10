@@ -205,7 +205,7 @@ class _CustomUIDemoState extends State<CustomUIDemo> {
   StageConnectionState _connectionState = StageConnectionState.disconnected;
   bool _isLocalAudioMuted = false;
   bool _isLocalVideoMuted = false;
-  bool _isBroadcasting = false;
+  // final bool _isBroadcasting = false;
   String? _selectedParticipantId;
 
   @override
@@ -245,9 +245,9 @@ class _CustomUIDemoState extends State<CustomUIDemo> {
 
     // Listen to broadcasting state
     FlutterIvsStage.broadcastingStream.listen((broadcasting) {
-      setState(() {
-        _isBroadcasting = broadcasting;
-      });
+      // setState(() {
+      //   _isBroadcasting = broadcasting;
+      // });
     });
 
     // Listen to errors
@@ -331,7 +331,7 @@ class _CustomUIDemoState extends State<CustomUIDemo> {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.7),
+                        color: Colors.black.withValues(alpha: .7),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -451,7 +451,7 @@ class _CustomUIDemoState extends State<CustomUIDemo> {
               margin: const EdgeInsets.symmetric(horizontal: 6),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: Colors.purple.withOpacity(0.5),
+                  color: Colors.purple.withValues(alpha: 0.5),
                   width: 2,
                 ),
                 borderRadius: BorderRadius.circular(12),
@@ -595,9 +595,9 @@ class _CameraPreviewDemoState extends State<CameraPreviewDemo> {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
+                color: Colors.orange.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
