@@ -113,6 +113,43 @@ class DemoSelectionPage extends StatelessWidget {
               ),
             ),
 
+            const SizedBox(height: 20),
+
+            // Camera Preview Option
+            Card(
+              elevation: 4,
+              child: InkWell(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CameraPreviewDemo(),
+                  ),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Icon(Icons.camera_alt, size: 48, color: Colors.orange),
+                      const SizedBox(height: 12),
+                      const Text(
+                        '📹 Camera Preview',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Preview camera before joining stage.\nToggle front/back camera with controls.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
             const Spacer(),
 
             const Text(
@@ -527,5 +564,178 @@ class _CustomUIDemoState extends State<CustomUIDemo> {
   void dispose() {
     FlutterIvsStage.dispose();
     super.dispose();
+  }
+}
+
+// Camera Preview Demo
+class CameraPreviewDemo extends StatefulWidget {
+  const CameraPreviewDemo({super.key});
+
+  @override
+  State<CameraPreviewDemo> createState() => _CameraPreviewDemoState();
+}
+
+class _CameraPreviewDemoState extends State<CameraPreviewDemo> {
+  String _currentCameraType = 'front';
+  String _statusMessage = 'Camera preview ready';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Camera Preview Demo'),
+        backgroundColor: Colors.orange,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            // Info section
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.orange.withOpacity(0.3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '📹 Camera Preview',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange[800],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'This demonstrates the camera preview functionality that allows users to see their camera feed before joining a stage.',
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Current Camera: $_currentCameraType',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: Colors.orange[700],
+                    ),
+                  ),
+                  Text(
+                    'Status: $_statusMessage',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Camera preview widget
+            Expanded(
+              child: CameraPreviewWidget(
+                initialCameraType: _currentCameraType,
+                aspectMode: 'fill',
+                showControls: true,
+                backgroundColor: Colors.grey[900]!,
+                borderRadius: 16,
+                onCameraChanged: (cameraType) {
+                  setState(() {
+                    _currentCameraType = cameraType;
+                    _statusMessage = 'Switched to $cameraType camera';
+                  });
+                },
+                onError: (error) {
+                  setState(() {
+                    _statusMessage = 'Error: $error';
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Camera Error: $error'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Action buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const BuiltInStageViewDemo(),
+                      ),
+                    );
+                  },
+                  icon: Icon(Icons.video_call),
+                  label: Text('Join Stage'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CustomUIDemo(),
+                      ),
+                    );
+                  },
+                  icon: Icon(Icons.palette),
+                  label: Text('Custom UI'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.purple,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            // Feature highlights
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Camera Preview Features:',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '• Preview camera before joining stage\n'
+                    '• Toggle between front and back cameras\n'
+                    '• Automatic mirroring for front camera\n'
+                    '• Error handling and retry functionality\n'
+                    '• Customizable aspect modes (fill/fit)',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

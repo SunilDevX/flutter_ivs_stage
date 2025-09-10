@@ -112,4 +112,27 @@ abstract class FlutterIvsStagePlatform extends PlatformInterface {
   }) {
     throw UnimplementedError('setVideoMirroring() has not been implemented.');
   }
+
+  /// Initialize camera preview before joining stage
+  ///
+  /// [cameraType] - 'front' or 'back' camera (default: 'front')
+  /// [aspectMode] - 'fill' or 'fit' (default: 'fill')
+  Future<void> initPreview({
+    String cameraType = 'front',
+    String aspectMode = 'fill',
+  }) {
+    throw UnimplementedError('initPreview() has not been implemented.');
+  }
+
+  /// Toggle between front and back camera
+  ///
+  /// [cameraType] - 'front' or 'back' camera
+  Future<void> toggleCamera(String cameraType) {
+    throw UnimplementedError('toggleCamera() has not been implemented.');
+  }
+
+  /// Stop camera preview
+  Future<void> stopPreview() {
+    throw UnimplementedError('stopPreview() has not been implemented.');
+  }
 }

@@ -27,11 +27,11 @@ class StageParticipant {
 
   /// Get the video stream for this participant
   StageStream? get videoStream =>
-      streams.where((s) => s.type == StageStreamType.video).firstOrNull;
+      streams.where((s) => s.type == StageStreamType.video).lastOrNull;
 
   /// Get the audio stream for this participant
   StageStream? get audioStream =>
-      streams.where((s) => s.type == StageStreamType.audio).firstOrNull;
+      streams.where((s) => s.type == StageStreamType.audio).lastOrNull;
 
   factory StageParticipant.fromMap(Map<String, dynamic> map) {
     return StageParticipant(

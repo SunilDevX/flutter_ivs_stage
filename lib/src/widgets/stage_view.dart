@@ -37,11 +37,67 @@ class _StageViewState extends State<StageView> {
   bool _mirrorLocalVideo = false;
   bool _mirrorRemoteVideo = false;
 
+  // Camera preview state
+  bool _isPreviewActive = false;
+  String _currentCameraType = 'front';
+  final String _aspectMode = 'fill';
+
   @override
   void initState() {
     super.initState();
     _setupStreams();
     _checkPermissions();
+    _initializeCameraPreview();
+  }
+
+  /// Initialize camera preview when not connected to stage
+  Future<void> _initializeCameraPreview() async {
+    if (_connectionState == StageConnectionState.disconnected) {
+      try {
+        await FlutterIvsStage.initPreview(
+          cameraType: _currentCameraType,
+          aspectMode: _aspectMode,
+        );
+        setState(() {
+          _isPreviewActive = true;
+        });
+        print('Camera preview initialized successfully');
+      } catch (e) {
+        print('Failed to initialize camera preview: $e');
+        setState(() {
+          _isPreviewActive = false;
+        });
+      }
+    }
+  }
+
+  /// Toggle camera between front and back
+  Future<void> _toggleCamera() async {
+    final newCameraType = _currentCameraType == 'front' ? 'back' : 'front';
+    try {
+      await FlutterIvsStage.toggleCamera(newCameraType);
+      setState(() {
+        _currentCameraType = newCameraType;
+      });
+      print('Camera toggled to: $newCameraType');
+    } catch (e) {
+      print('Failed to toggle camera: $e');
+    }
+  }
+
+  /// Stop camera preview
+  Future<void> _stopPreview() async {
+    if (_isPreviewActive) {
+      try {
+        await FlutterIvsStage.stopPreview();
+        setState(() {
+          _isPreviewActive = false;
+        });
+        print('Camera preview stopped');
+      } catch (e) {
+        print('Failed to stop camera preview: $e');
+      }
+    }
   }
 
   /// Safely update participant selection, preserving current selection when possible
@@ -70,9 +126,15 @@ class _StageViewState extends State<StageView> {
         _connectionState = state;
       });
 
-      // Apply default mirroring when connected
+      // Handle camera preview based on connection state
       if (state == StageConnectionState.connected) {
+        // Stop preview when joining stage
+        _stopPreview();
+        // Apply default mirroring when connected
         _updateMirroring();
+      } else if (state == StageConnectionState.disconnected) {
+        // Restart preview when disconnected
+        _initializeCameraPreview();
       }
     });
 
@@ -148,12 +210,19 @@ class _StageViewState extends State<StageView> {
   }
 
   Widget _buildMainViewArea() {
-    final selectedParticipant = _participants.firstWhere(
-      (p) => p.participantId == _selectedParticipantId,
-      orElse: () => _participants.isNotEmpty
-          ? _participants.first
-          : _createEmptyParticipant(),
-    );
+    // If preview is active and no participants, show preview participant
+    StageParticipant selectedParticipant;
+
+    if (_isPreviewActive && _participants.isEmpty) {
+      selectedParticipant = _createPreviewParticipant();
+    } else {
+      selectedParticipant = _participants.firstWhere(
+        (p) => p.participantId == _selectedParticipantId,
+        orElse: () => _participants.isNotEmpty
+            ? _participants.first
+            : _createEmptyParticipant(),
+      );
+    }
 
     return Container(
       width: double.infinity,
@@ -316,7 +385,38 @@ class _StageViewState extends State<StageView> {
   }
 
   Widget _buildJoinControls() {
-    return JoinStageWidget(initialToken: widget.initialToken);
+    return Column(
+      children: [
+        // Camera preview controls (when disconnected)
+        if (_connectionState == StageConnectionState.disconnected)
+          _buildPreviewControls(),
+        const SizedBox(height: 16),
+        // Join stage widget
+        JoinStageWidget(initialToken: widget.initialToken),
+      ],
+    );
+  }
+
+  Widget _buildPreviewControls() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildControlButton(
+          icon: _currentCameraType == 'front'
+              ? Icons.camera_front
+              : Icons.camera_rear,
+          label: _currentCameraType == 'front' ? 'Front Camera' : 'Back Camera',
+          onPressed: _toggleCamera,
+          backgroundColor: Colors.blue,
+        ),
+        _buildControlButton(
+          icon: Icons.flip_camera_ios,
+          label: 'Flip Camera',
+          onPressed: _toggleCamera,
+          backgroundColor: Colors.purple,
+        ),
+      ],
+    );
   }
 
   Widget _buildStageControls() {
@@ -438,6 +538,29 @@ class _StageViewState extends State<StageView> {
     );
   }
 
+  /// Creates a preview participant for showing camera preview before joining stage
+  StageParticipant _createPreviewParticipant() {
+    return StageParticipant(
+      isLocal: true,
+      participantId: 'preview_local_user',
+      publishState: StageParticipantPublishState.published,
+      subscribeState: StageParticipantSubscribeState.subscribed,
+      streams: [
+        StageStream(
+          deviceId: 'preview_camera_$_currentCameraType',
+          type: StageStreamType.video,
+          isMuted: false,
+        ),
+        const StageStream(
+          deviceId: 'preview_microphone',
+          type: StageStreamType.audio,
+          isMuted: true, // Start with audio muted in preview
+        ),
+      ],
+      broadcastSlotName: 'preview',
+    );
+  }
+
   StageParticipant _createEmptyParticipant() {
     return const StageParticipant(
       isLocal: false,
@@ -451,6 +574,7 @@ class _StageViewState extends State<StageView> {
 
   @override
   void dispose() {
+    _stopPreview();
     FlutterIvsStage.dispose();
     super.dispose();
   }

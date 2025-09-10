@@ -186,4 +186,27 @@ class MethodChannelFlutterIvsStage extends FlutterIvsStagePlatform {
       'remoteVideo': remoteVideo,
     });
   }
+
+  @override
+  Future<void> initPreview({
+    String cameraType = 'front',
+    String aspectMode = 'fill',
+  }) async {
+    await methodChannel.invokeMethod('initPreview', {
+      'cameraType': cameraType,
+      'aspectMode': aspectMode,
+    });
+  }
+
+  @override
+  Future<void> toggleCamera(String cameraType) async {
+    await methodChannel.invokeMethod('toggleCamera', {
+      'cameraType': cameraType,
+    });
+  }
+
+  @override
+  Future<void> stopPreview() async {
+    await methodChannel.invokeMethod('stopPreview');
+  }
 }

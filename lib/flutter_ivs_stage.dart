@@ -113,4 +113,79 @@ class FlutterIvsStage {
       remoteVideo: remoteVideo,
     );
   }
+
+  /// Initialize camera preview before joining stage
+  ///
+  /// This allows users to see their camera feed before joining the stage.
+  ///
+  /// [cameraType] - Camera to use: 'front' (default) or 'back'
+  /// [aspectMode] - How to display the preview: 'fill' (default) or 'fit'
+  ///
+  /// Example:
+  /// ```dart
+  /// // Initialize front camera with fill aspect mode
+  /// await FlutterIvsStage.initPreview();
+  ///
+  /// // Initialize back camera with fit aspect mode
+  /// await FlutterIvsStage.initPreview(
+  ///   cameraType: 'back',
+  ///   aspectMode: 'fit',
+  /// );
+  /// ```
+  static Future<void> initPreview({
+    String cameraType = 'front',
+    String aspectMode = 'fill',
+  }) {
+    return _platform.initPreview(
+      cameraType: cameraType,
+      aspectMode: aspectMode,
+    );
+  }
+
+  /// Toggle between front and back camera
+  ///
+  /// [cameraType] - Camera to switch to: 'front' or 'back'
+  ///
+  /// Example:
+  /// ```dart
+  /// // Switch to back camera
+  /// await FlutterIvsStage.toggleCamera('back');
+  ///
+  /// // Switch to front camera
+  /// await FlutterIvsStage.toggleCamera('front');
+  /// ```
+  static Future<void> toggleCamera(String cameraType) {
+    return _platform.toggleCamera(cameraType);
+  }
+
+  /// Stop camera preview
+  ///
+  /// This stops the camera preview that was started with [initPreview].
+  /// Usually called when leaving the preview screen or joining the stage.
+  static Future<void> stopPreview() {
+    return _platform.stopPreview();
+  }
+
+  /// Local participant object representing the user
+  static StageParticipant? get localParticipant {
+    return StageParticipant(
+      isLocal: true,
+      participantId: 'preview_local_user',
+      publishState: StageParticipantPublishState.published,
+      subscribeState: StageParticipantSubscribeState.subscribed,
+      streams: [
+        StageStream(
+          deviceId: 'preview_camera_front',
+          type: StageStreamType.video,
+          isMuted: false,
+        ),
+        const StageStream(
+          deviceId: 'preview_microphone',
+          type: StageStreamType.audio,
+          isMuted: true,
+        ),
+      ],
+      broadcastSlotName: 'preview',
+    );
+  }
 }

@@ -152,6 +152,39 @@ public class FlutterIvsStagePlugin: NSObject, FlutterPlugin {
                 result(FlutterError(code: "INVALID_ARGUMENTS", message: "localVideo and remoteVideo flags are required", details: nil))
             }
             
+        case "initPreview":
+            if let args = call.arguments as? [String: Any] {
+                let cameraType = args["cameraType"] as? String ?? "front"
+                let aspectMode = args["aspectMode"] as? String ?? "fill"
+                stageManager.initPreview(cameraType: cameraType, aspectMode: aspectMode) { error in
+                    if let error = error {
+                        result(FlutterError(code: "PREVIEW_FAILED", message: error.localizedDescription, details: nil))
+                    } else {
+                        result(nil)
+                    }
+                }
+            } else {
+                result(FlutterError(code: "INVALID_ARGUMENTS", message: "Invalid arguments for initPreview", details: nil))
+            }
+            
+        case "toggleCamera":
+            if let args = call.arguments as? [String: Any],
+               let cameraType = args["cameraType"] as? String {
+                stageManager.toggleCamera(cameraType: cameraType) { error in
+                    if let error = error {
+                        result(FlutterError(code: "CAMERA_TOGGLE_FAILED", message: error.localizedDescription, details: nil))
+                    } else {
+                        result(nil)
+                    }
+                }
+            } else {
+                result(FlutterError(code: "INVALID_ARGUMENTS", message: "Camera type is required", details: nil))
+            }
+            
+        case "stopPreview":
+            stageManager.stopPreview()
+            result(nil)
+            
         default:
             result(FlutterMethodNotImplemented)
         }

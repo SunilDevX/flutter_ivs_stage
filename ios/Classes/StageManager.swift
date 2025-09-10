@@ -19,6 +19,7 @@ class StageManager: NSObject {
     
     private var videoViews: [String: UIView] = [:]
     private var localVideoView: UIView?
+    private var aspectMode: String?
     
     // Video mirroring settings
     private var shouldMirrorLocalVideo: Bool = false
@@ -167,6 +168,38 @@ class StageManager: NSObject {
         setupLocalVideoPreview()
     }
     
+    /// Ensure local streams exist (used for preview functionality)
+    private func ensureLocalStreamsExist() {
+        print("Ivsstage: ensureLocalStreamsExist - current streams count: \(localStreams.count)")
+        
+        // Check if camera stream already exists
+        let hasCameraStream = localStreams.contains { $0.device is IVSImageDevice }
+        let hasAudioStream = localStreams.contains { $0.device is IVSAudioDevice }
+        
+        if !hasCameraStream, let camera = camera {
+            print("Ivsstage: ensureLocalStreamsExist - creating camera stream")
+            let config = IVSLocalStageStreamConfiguration()
+            config.audio.enableNoiseSuppression = false
+            var currentStreams = localStreams
+            currentStreams.append(IVSLocalStageStream(device: camera, config: config))
+            localStreams = currentStreams
+        }
+        
+        if !hasAudioStream, let microphone = microphone {
+            print("Ivsstage: ensureLocalStreamsExist - creating audio stream")
+            var currentStreams = localStreams
+            currentStreams.append(IVSLocalStageStream(device: microphone))
+            localStreams = currentStreams
+        }
+        
+        // Notify UI updates if streams were added
+        if !hasCameraStream || !hasAudioStream {
+            notifyParticipantsUpdate()
+        }
+        
+        print("Ivsstage: ensureLocalStreamsExist - final streams count: \(localStreams.count)")
+    }
+    
     @objc
     private func applicationDidEnterBackground() {
         print("app did enter background")
@@ -229,18 +262,50 @@ class StageManager: NSObject {
     }
     
     func leaveStage() {
-        // Clean up video views
-        if let localView = localVideoView {
-            cleanupLocalVideoPreview(view: localView)
-        }
-        videoViews.forEach { (participantId, view) in
-            cleanupVideoStream(for: participantId, view: view)
+        print("Ivsstage: Leaving stage")
+        stage?.leave()
+        stage = nil 
+        
+        // Clear participants
+        participantsData.removeAll()
+        
+        // Clear all video views
+        for (_, view) in videoViews {
+            view.removeFromSuperview()
         }
         videoViews.removeAll()
+        
+        // Remove local video view
+        localVideoView?.removeFromSuperview()
         localVideoView = nil
         
-        stage?.leave()
+        // Clear streams
+        localStreams.removeAll()
+        
+        // Dispose all devices
+        disposeDevices()
+        
+        delegate?.stageManager(self, didUpdateParticipants: [])
+        delegate?.stageManager(self, didChangeConnectionState: .disconnected)
+        
+        print("Ivsstage: Stage left and all devices disposed")
     }
+    
+    
+    private func disposeDevices() {
+        print("Ivsstage: Disposing camera and microphone devices")
+        
+        // Stop camera capture
+        if let camera = camera {
+            camera.delegate = nil
+        }
+        
+        // Stop microphone capture
+        if let microphone = microphone {
+            microphone.delegate = nil
+        }
+    }
+    
     
     func toggleLocalVideoMute() {
         isVideoMuted.toggle()
@@ -348,6 +413,98 @@ class StageManager: NSObject {
         }
     }
     
+    // MARK: - Camera Preview Methods
+    
+    /// Initialize camera preview before joining stage
+    func initPreview(cameraType: String, aspectMode: String, completion: @escaping (Error?) -> Void) {
+        print("Ivsstage: initPreview - cameraType: \(cameraType), aspectMode: \(aspectMode)")
+        self.aspectMode = aspectMode
+        guard let camera = camera else {
+            completion(NSError(domain: "IVSStageError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Camera not available"]))
+            return
+        }
+        
+        // Ensure local streams are created for preview
+        ensureLocalStreamsExist()
+        
+        // Set camera input source based on type
+        setCameraType(cameraType) { [weak self] error in
+            if let error = error {
+                completion(error)
+                return
+            }
+            
+            // Store aspect mode for preview (could be used in UI implementation)
+            // For now, we'll always use 'fill' behavior in the preview view constraints
+            completion(nil)
+        }
+    }
+    
+    /// Toggle camera between front and back
+    func toggleCamera(cameraType: String, completion: @escaping (Error?) -> Void) {
+        print("Ivsstage: toggleCamera - switching to: \(cameraType)")
+        setCameraType(cameraType, completion: completion)
+    }
+    
+    /// Stop camera preview
+    func stopPreview() {
+        print("Ivsstage: Stopping camera preview")
+        
+        // Remove local video view
+        localVideoView?.removeFromSuperview()
+        localVideoView = nil
+        
+        // Clear local streams properly
+        localStreams.removeAll()
+        
+        // Dispose camera and microphone devices
+        disposeDevices()
+        
+        print("Ivsstage: Camera preview stopped and devices disposed")
+    }
+    
+    
+    
+    /// Helper method to set camera input source
+    private func setCameraType(_ cameraType: String, completion: @escaping (Error?) -> Void) {
+        guard let camera = camera else {
+            completion(NSError(domain: "IVSStageError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Camera not available"]))
+            return
+        }
+        
+        let position: IVSDevicePosition = cameraType == "front" ? .front : .back
+        
+        if let targetSource = camera.listAvailableInputSources().first(where: { $0.position == position }) {
+            camera.setPreferredInputSource(targetSource) { error in
+                DispatchQueue.main.async {
+                    if let error = error {
+                        print("Ivsstage: setCameraType - failed to set camera to \(cameraType): \(error)")
+                        completion(error)
+                    } else {
+                        print("Ivsstage: setCameraType - successfully set camera to \(cameraType)")
+                        // Refresh the local video preview if it exists
+                        self.refreshLocalVideoPreview()
+                        completion(nil)
+                    }
+                }
+            }
+        } else {
+            let error = NSError(domain: "IVSStageError", code: -2, userInfo: [NSLocalizedDescriptionKey: "Camera type '\(cameraType)' not available"])
+            completion(error)
+        }
+    }
+    
+    /// Refresh local video preview (useful after camera switching)
+    private func refreshLocalVideoPreview() {
+        guard let localView = localVideoView else { return }
+        
+        // Clear existing preview
+        localView.subviews.forEach { $0.removeFromSuperview() }
+        
+        // Setup preview again with new camera
+        setupLocalVideoPreview()
+    }
+    
     private func applyMirroring(to view: UIView, shouldMirror: Bool) {
         if shouldMirror {
             // Apply horizontal mirroring
@@ -392,7 +549,9 @@ class StageManager: NSObject {
             print("Ivsstage: setupLocalVideoPreview - setting up camera preview for device: \(imageDevice)")
             
             do {
-                let preview = try imageDevice.previewView()
+                let preview = try imageDevice.previewView(
+                    with: aspectMode == "fill" ? .fill :  aspectMode == "fit" ? .fit : .none
+                )
                 print("Ivsstage: setupLocalVideoPreview - created preview view: \(preview)")
                 
                 // Add the preview view
@@ -931,4 +1090,4 @@ extension IVSParticipantSubscribeState {
         }
     }
 }
- 
+

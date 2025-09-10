@@ -7,6 +7,7 @@ import '../../flutter_ivs_stage.dart';
 class ParticipantVideoView extends StatelessWidget {
   final StageParticipant participant;
   final bool showControls;
+  final bool showOverlays;
   final bool isCompact;
   final bool showVideoPreview;
 
@@ -14,6 +15,7 @@ class ParticipantVideoView extends StatelessWidget {
     super.key,
     required this.participant,
     this.showControls = true,
+    this.showOverlays = true,
     this.isCompact = false,
     this.showVideoPreview = true,
   });
@@ -24,27 +26,30 @@ class ParticipantVideoView extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.black,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: _getBorderColor(), width: _getBorderWidth()),
+        border: !showOverlays
+            ? null
+            : Border.all(color: _getBorderColor(), width: _getBorderWidth()),
       ),
       child: Stack(
         children: [
           // Video content
           _buildVideoContent(),
+          if (showOverlays) ...[
+            // Overlays
+            if (!isCompact) ...[
+              // Participant info
+              _buildParticipantInfo(),
 
-          // Overlays
-          if (!isCompact) ...[
-            // Participant info
-            _buildParticipantInfo(),
+              // State indicators
+              _buildStateIndicators(),
 
-            // State indicators
-            _buildStateIndicators(),
-
-            // Audio only toggle (for remote participants)
-            if (showControls && !participant.isLocal)
-              _buildAudioOnlyToggle(context),
-          ] else ...[
-            // Compact view overlays
-            _buildCompactOverlay(),
+              // Audio only toggle (for remote participants)
+              if (showControls && !participant.isLocal)
+                _buildAudioOnlyToggle(context),
+            ] else ...[
+              // Compact view overlays
+              _buildCompactOverlay(),
+            ],
           ],
         ],
       ),
